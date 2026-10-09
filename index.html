@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>NEMESIS PREMIER LEAGUE </title>
+<style>
+:root{--bg:#0a0607;--panel:#140a0c;--maroon:#6b0f1a;--maroon2:#8a1424;--gold:#e6b93c;--gold2:#b8902a;--ink:#f3e7c4;--line:#3a1a1f;--red:#ff6b6b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif}
+body{display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:12px;padding:8px 14px;background:linear-gradient(90deg,#2a050a,var(--maroon),#2a050a);border-bottom:3px solid var(--gold)}
+h1{margin:0;font-size:clamp(16px,2.2vw,28px);letter-spacing:2px;color:var(--gold);flex:1;text-align:center}
+.btn{background:var(--maroon);color:var(--gold);border:1px solid var(--gold);padding:7px 14px;font-weight:700;border-radius:4px;cursor:pointer;font-size:14px}
+.btn:hover{background:var(--maroon2)}
+.btn.gold{background:var(--gold);color:#1a0508}.btn.gold:hover{background:#f5cc55}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.stats{display:flex;justify-content:center;gap:18px;padding:5px;background:#000;border-bottom:1px solid var(--line);font-size:13px;color:#c9b27a;flex-wrap:wrap}
+.stats b{color:var(--gold)}
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(250px,23vw) 1fr minmax(250px,23vw);gap:10px;padding:10px}
+.side{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto}
+.cap{border:2px solid var(--gold2);background:var(--panel);flex:1 0 auto}
+.cap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.cap th,.cap td{border:1px solid var(--line);padding:0;height:23px}
+.cap .hd{background:var(--maroon);color:var(--gold);text-align:center;font-weight:800;letter-spacing:1px}
+.cap .hd input{font-weight:800;text-align:center;text-transform:uppercase;color:var(--gold)}
+.cap .colh th{background:#1d0b0e;color:var(--gold);font-size:11px;height:19px}
+.cap input{width:100%;height:100%;background:transparent;border:0;color:var(--ink);padding:0 6px;font:inherit;outline:none}
+.cap input:focus{background:#2a1015;box-shadow:inset 0 0 0 1px var(--gold)}
+.cap td.no{width:26px;text-align:center;color:var(--gold);font-weight:700}
+.cap td.bid{width:76px}.cap td.bid input{text-align:right;color:var(--gold);font-weight:700}
+.cap input[type=number]::-webkit-inner-spin-button{display:none}
+.cap input[type=number]{-moz-appearance:textfield}
+.cap .sum td{text-align:center;font-weight:700}
+.cap .spend td{background:#4a0a12}.cap .bal td{background:#1d0b0e}
+.cap .max td{background:var(--gold2);color:#1a0508;font-weight:800}
+.cap .val{color:var(--gold)}.cap .max .val{color:#1a0508}
+.cap.warn{border-color:var(--red)}.cap .neg{color:var(--red)!important}
+.center{display:flex;flex-direction:column;min-height:0;gap:8px}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#000;border:2px solid var(--gold);position:relative;overflow:hidden}
+#stage canvas{max-width:100%;max-height:100%}
+#msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;color:var(--gold);font-size:20px}
+#msg small{color:#c9b27a;font-size:14px}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.controls .btn{font-size:16px;padding:10px 22px}
+#sold{background:#1f6b32;border-color:#7be39a;color:#eaffef}#sold:hover{background:#27863f}
+#unsold{background:var(--maroon2)}
+dialog{background:var(--panel);color:var(--ink);border:2px solid var(--gold);padding:20px;max-width:360px;width:90%}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog h2{margin:0 0 12px;color:var(--gold);font-size:18px}
+dialog label{display:flex;justify-content:space-between;align-items:center;margin:9px 0;gap:10px;font-size:14px}
+dialog input{width:110px;background:#000;border:1px solid var(--gold2);color:var(--gold);padding:6px;font-size:15px;text-align:right}
+dialog .row{display:flex;gap:8px;margin-top:16px;justify-content:space-between;flex-wrap:wrap}
+dialog p{font-size:12px;color:#c9b27a;margin:6px 0}
+@media(max-width:900px){body{overflow:auto}main{grid-template-columns:1fr}.center{order:-1;height:70vh}.side{overflow:visible}}
+</style>
+</head>
+<body>
+<header>
+  <label class="btn" for="pdf">📄 Load PDF</label><input id="pdf" type="file" accept="application/pdf" hidden>
+  <h1>NEMESIS TOURNAMENT AUCTION</h1>
+  <button class="btn" id="undo">↩ Undo</button>
+  <button class="btn" id="cfg">⚙ Settings</button>
+  <button class="btn" id="reset" style="color:#ff9a9a;border-color:#ff9a9a">⟲ Reset All</button>
+</header>
+<div class="stats" id="stats"></div>
+<main>
+  <div class="side" id="left"></div>
+  <div class="center">
+    <div id="stage"><div id="msg">Click <b>Load PDF</b> to begin<small>The file stays on your computer.</small></div></div>
+    <div class="controls">
+      <button class="btn" id="skip" title="Shortcut: K">⏭ Skip slide (not a player)</button>
+      <button class="btn" id="unsold" title="Shortcut: U">✖ Unsold</button>
+      <button class="btn" id="sold" title="Shortcut: S">✔ Sold</button>
+    </div>
+  </div>
+  <div class="side" id="right"></div>
+</main>
+
+<dialog id="dlg">
+  <h2>Auction Settings</h2>
+  <label>Wallet per captain (₹)<input type="number" id="sWallet" min="0"></label>
+  <label>Base price (₹)<input type="number" id="sBase" min="0"></label>
+  <label>Team size (incl. captain)<input type="number" id="sTeam" min="2" max="30"></label>
+  <p>Players each captain bids for = team size − 1. Max for next player = balance − base × (slots left after this one).</p>
+  <div class="row">
+    <button class="btn" id="resetAll" style="color:#ff9a9a;border-color:#ff9a9a">Reset everything</button>
+    <button class="btn gold" id="close">Done</button>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const KEY='nemesis-auction-v1';
+const NAMES=['Vikas','Rahul','Ashlesh','Neelind','Irfan','Anan'];
+let S=load();
+let pdfDoc=null,renderTask=null;
+
+function fresh(){return{cfg:{team:7,wallet:1200,base:50,names:[...NAMES]},rows:NAMES.map(()=>[]),total:0,queue:[],unsold:[],sold:[],skipped:[],round:1,hist:[]}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.cfg)return d}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const slots=()=>Math.max(1,S.cfg.team-1);
+const fmt=n=>'₹'+Math.round(Number(n)||0).toLocaleString('en-IN');
+
+function ensureRows(){S.rows=S.cfg.names.map((_,i)=>{const r=S.rows[i]||[];while(r.length<slots())r.push({n:'',b:''});return r.slice(0,slots())})}
+
+function buildTables(){
+  ensureRows();
+  $('#left').innerHTML='';$('#right').innerHTML='';
+  S.cfg.names.forEach((nm,i)=>{
+    const d=document.createElement('div');d.className='cap';d.id='cap'+i;
+    let h=`<table><tr><th class="hd" colspan="3"><input data-cn="${i}" value="${nm.replace(/"/g,'&quot;')}"></th></tr><tr class="colh"><th>No</th><th>Player Name</th><th>Bid (₹)</th></tr>`;
+    S.rows[i].forEach((r,j)=>{h+=`<tr><td class="no">${j+1}</td><td><input data-i="${i}" data-j="${j}" data-f="n" value="${(r.n||'').replace(/"/g,'&quot;')}"></td><td class="bid"><input type="number" min="0" data-i="${i}" data-j="${j}" data-f="b" value="${r.b}"></td></tr>`});
+    h+=`<tr class="sum spend"><td colspan="2">Total Spend</td><td class="val" id="sp${i}"></td></tr><tr class="sum bal"><td colspan="2">Budget Left</td><td class="val" id="ba${i}"></td></tr><tr class="sum max"><td colspan="2">Max for Next Player</td><td class="val" id="mx${i}"></td></tr></table>`;
+    d.innerHTML=h;
+    (i<3?$('#left'):$('#right')).appendChild(d);
+  });
+  updateTotals();
+}
+
+function updateTotals(){
+  S.rows.forEach((rows,i)=>{
+    const spent=rows.reduce((a,r)=>a+(Number(r.b)||0),0);
+    const filled=rows.filter(r=>(r.n||'').trim()||Number(r.b)>0).length;
+    const left=slots()-filled, bal=S.cfg.wallet-spent;
+    const max=left<=0?0:Math.max(0,bal-S.cfg.base*(left-1));
+    $('#sp'+i).textContent=fmt(spent);
+    const b=$('#ba'+i);b.textContent=fmt(bal);b.classList.toggle('neg',bal<0);
+    $('#mx'+i).textContent=fmt(max);
+    $('#cap'+i).classList.toggle('warn',bal<0||(left>0&&bal<S.cfg.base*left));
+  });
+}
+
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.cn!==undefined){S.cfg.names[t.dataset.cn]=t.value;save();return}
+  if(t.dataset.f){S.rows[t.dataset.i][t.dataset.j][t.dataset.f]=t.value;save();updateTotals()}
+});
+
+/* ---------- queue logic ---------- */
+function snap(){S.hist.push(JSON.stringify({q:S.queue,u:S.unsold,s:S.sold,k:S.skipped,r:S.round}));if(S.hist.length>200)S.hist.shift()}
+function advance(){if(!S.queue.length&&S.unsold.length){S.queue=S.unsold;S.unsold=[];S.round++}}
+function act(kind){
+  if(!S.queue.length)return;
+  snap();const p=S.queue.shift();
+  ({sold:S.sold,unsold:S.unsold,skip:S.skipped})[kind].push(p);
+  advance();save();show();
+}
+function undo(){
+  const h=S.hist.pop();if(!h)return;
+  const o=JSON.parse(h);S.queue=o.q;S.unsold=o.u;S.sold=o.s;S.skipped=o.k;S.round=o.r;save();show();
+}
+$('#sold').onclick=()=>act('sold');$('#unsold').onclick=()=>act('unsold');$('#skip').onclick=()=>act('skip');$('#undo').onclick=undo;
+document.addEventListener('keydown',e=>{
+  if(/INPUT|TEXTAREA/.test(e.target.tagName)||e.ctrlKey||e.metaKey)return;
+  const k=e.key.toLowerCase();
+  if(k==='s')act('sold');else if(k==='u')act('unsold');else if(k==='k')act('skip');else if(k==='z')undo();
+});
+
+/* ---------- pdf ---------- */
+$('#pdf').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  setMsg('Loading PDF…');
+  try{
+    const buf=await f.arrayBuffer();
+    pdfDoc=await openPdf(buf.slice(0));
+    idbSet(buf);
+    const n=pdfDoc.numPages;
+    const total=S.sold.length+S.unsold.length+S.skipped.length+S.queue.length;
+    if(S.total!==n||total!==n){
+      S.total=n;S.queue=Array.from({length:n},(_,i)=>i+1);S.unsold=[];S.sold=[];S.skipped=[];S.round=1;S.hist=[];
+    }
+    save();show();
+  }catch(err){setMsg('Could not open the PDF.<small>'+(err&&err.message||err)+'</small>')}
+  e.target.value='';
+};
+async function openPdf(buf){
+  window.pdfjsWorker=window.pdfjsWorker||window['pdfjs-dist/build/pdf.worker'];
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  return pdfjsLib.getDocument({data:buf}).promise;
+}
+/* keep the PDF in the browser so a refresh doesn't lose it */
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('nemesis-auction',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbSet(buf){try{const d=await idb();d.transaction('f','readwrite').objectStore('f').put(buf,'pdf')}catch(e){}}
+async function idbGet(){try{const d=await idb();return await new Promise(res=>{const q=d.transaction('f').objectStore('f').get('pdf');q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch(e){return null}}
+async function idbDel(){try{const d=await idb();d.transaction('f','readwrite').objectStore('f').delete('pdf')}catch(e){}}
+async function restorePdf(){
+  if(!S.total)return;
+  const buf=await idbGet();if(!buf)return;
+  try{pdfDoc=await openPdf(buf.slice(0));show()}catch(e){}
+}
+function setMsg(h){$('#stage').innerHTML='<div id="msg">'+h+'</div>'}
+
+async function show(){
+  const done=S.total>0&&!S.queue.length&&!S.unsold.length;
+  $('#stats').innerHTML=S.total?`<span>Round <b>${S.round}</b></span><span>Left this round <b>${S.queue.length}</b></span><span>Sold <b>${S.sold.length}</b></span><span>Unsold (next round) <b>${S.unsold.length}</b></span><span>Skipped slides <b>${S.skipped.length}</b></span>`:'';
+  const has=S.queue.length>0;
+  ['#sold','#unsold','#skip'].forEach(s=>$(s).disabled=!has);
+  $('#undo').disabled=!S.hist.length;
+  if(done){setMsg('🏆 Auction complete!<small>All players have been sold.</small>');return}
+  if(!S.total||!has)return;
+  if(!pdfDoc){setMsg(`Progress restored (Round ${S.round}, ${S.queue.length} left in this round).<small>Click <b>Load PDF</b> and pick the same file to continue.</small>`);return}
+  const stage=$('#stage');
+  if(!stage.querySelector('canvas')){stage.innerHTML='<canvas></canvas>'}
+  const cv=stage.querySelector('canvas');
+  const page=await pdfDoc.getPage(S.queue[0]);
+  const base=page.getViewport({scale:1});
+  const r=stage.getBoundingClientRect();
+  const sc=Math.min((r.width-6)/base.width,(r.height-6)/base.height);
+  const dpr=window.devicePixelRatio||1;
+  const vp=page.getViewport({scale:sc*dpr});
+  cv.width=vp.width;cv.height=vp.height;
+  cv.style.width=vp.width/dpr+'px';cv.style.height=vp.height/dpr+'px';
+  if(renderTask){try{renderTask.cancel()}catch(e){}}
+  renderTask=page.render({canvasContext:cv.getContext('2d'),viewport:vp});
+  try{await renderTask.promise}catch(e){}
+}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(show,150)});
+
+/* ---------- settings ---------- */
+const dlg=$('#dlg');
+$('#cfg').onclick=()=>{$('#sWallet').value=S.cfg.wallet;$('#sBase').value=S.cfg.base;$('#sTeam').value=S.cfg.team;dlg.showModal()};
+$('#close').onclick=()=>{
+  S.cfg.wallet=Math.max(0,Number($('#sWallet').value)||0);
+  S.cfg.base=Math.max(0,Number($('#sBase').value)||0);
+  S.cfg.team=Math.min(30,Math.max(2,Math.round(Number($('#sTeam').value)||7)));
+  save();buildTables();dlg.close();
+};
+function doReset(){
+  if(confirm('Clear ALL tables, progress, settings and the loaded PDF? This cannot be undone.')){S=fresh();pdfDoc=null;idbDel();save();buildTables();setMsg('Click <b>Load PDF</b> to begin<small>The file stays on your computer.</small>');show();if(dlg.open)dlg.close()}
+}
+$('#resetAll').onclick=doReset;$('#reset').onclick=doReset;
+
+buildTables();show();restorePdf();
+</script>
+</body>
+</html>
